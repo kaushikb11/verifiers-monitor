@@ -4,6 +4,8 @@
 
 Running RL experiments without visibility into rollout quality, reward distributions, or failure modes wastes time. Monitor gives you live tracking, per-example inspection, and programmatic access—see what's happening during runs and debug what went wrong after.
 
+The RL ecosystem is maturing— [verifiers](https://github.com/PrimeIntellect-ai/verifiers) are standardizing how we build and share environments. However, as it grows, we need observability tooling that actually understands RL primitives.
+
 ![Dashboard](./verifiers_monitor/assets/dashboard.png)
 
 ## Quick Start
