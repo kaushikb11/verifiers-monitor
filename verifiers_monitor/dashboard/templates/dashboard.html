@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifiers Pro — Reinforcement Learning Evaluation Platform</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- External Dependencies -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.294.0"></script>
+
+    <!-- Dashboard Styles -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+
+    <!-- Main Content (Full Width, No Sidebar) -->
+    <div class="main-content-full">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="page-title" id="evaluation-title">Evaluation Dashboard</h1>
+                <div class="breadcrumb">
+                    <span id="environment-name">Loading...</span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span id="model-name">...</span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <div class="session-selector-wrapper">
+                    <i data-lucide="clock"></i>
+                    <select id="session-selector" class="session-selector" onchange="switchSession()">
+                        <option value="current">Current Session</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Compact Context Bar -->
+        <div class="context-bar" id="context-bar">
+            <div class="context-item">
+                <i data-lucide="database"></i>
+                <span id="context-env-type">Loading...</span>
+                <span class="context-meta" id="context-dataset-size">...</span>
+            </div>
+            <div class="context-divider"></div>
+            <div class="context-item">
+                <i data-lucide="target"></i>
+                <span id="context-reward-count">...</span>
+                <span class="context-meta" id="context-max-reward">...</span>
+            </div>
+            <div class="context-divider"></div>
+            <div class="context-item">
+                <i data-lucide="wrench"></i>
+                <span id="context-tools">...</span>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <section class="stats-section">
+            <div class="stat-card stat-card-primary">
+                <div class="stat-header">
+                    <div class="stat-icon success-icon">
+                        <i data-lucide="target"></i>
+                    </div>
+                    <div class="stat-badge" id="status-badge">Completed</div>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value" id="primary-score">--</div>
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-trend">
+                        <i data-lucide="trending-up"></i>
+                        <span id="primary-detail">Waiting for data</span>
+                    </div>
+                </div>
+                <div class="stat-chart" id="success-sparkline"></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <div class="stat-meta">
+                        <span id="progress-display">0/0</span>
+                    </div>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value" id="speed-score">--</div>
+                    <div class="stat-label">Avg Response Time</div>
+                    <div class="stat-detail" id="speed-detail">Waiting for data</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i data-lucide="bar-chart-2"></i>
+                    </div>
+                    <div class="stat-meta">
+                        <span id="rollouts-meta">--</span>
+                    </div>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value" id="consistency-score">--</div>
+                    <div class="stat-label">Consistency</div>
+                    <div class="stat-detail" id="consistency-detail">Waiting for data</div>
+                </div>
+            </div>
+
+            <div class="stat-card stat-card-accent">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i data-lucide="activity"></i>
+                    </div>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-label">Live Monitoring</div>
+                    <div class="live-activity">
+                        <div class="activity-indicator"></div>
+                        <span>Real-time updates active</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Chart Section -->
+        <section class="chart-section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Performance Over Time</h2>
+                    <p class="section-description">Reward progression and evaluation metrics</p>
+                </div>
+                <div class="chart-controls" id="chart-controls" style="display: none;">
+                    <button class="chart-control-btn active" data-chart-type="line">
+                        <i data-lucide="line-chart"></i>
+                        Line
+                    </button>
+                    <button class="chart-control-btn" data-chart-type="distribution">
+                        <i data-lucide="bar-chart-2"></i>
+                        Distribution
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div id="progress-chart" class="chart-canvas"></div>
+            </div>
+        </section>
+
+        <!-- Example Inspector -->
+        <section class="inspector-section" id="examples">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Example Inspector</h2>
+                    <p class="section-description">Deep dive into individual evaluations</p>
+                </div>
+                <div id="filter-controls" class="filter-pills" style="display: none;">
+                    <button class="filter-btn pill-btn active" onclick="window.navigationManager.setFilter('all')" data-filter="all">
+                        All <span class="pill-count" id="count-all">0</span>
+                    </button>
+                    <button class="filter-btn pill-btn pill-success" onclick="window.navigationManager.setFilter('passed')" data-filter="passed">
+                        Passed <span class="pill-count" id="count-passed">0</span>
+                    </button>
+                    <button class="filter-btn pill-btn pill-danger" onclick="window.navigationManager.setFilter('failed')" data-filter="failed">
+                        Failed <span class="pill-count" id="count-failed">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="failure-summary" class="alert-box" style="display: none;"></div>
+
+            <!-- NEW: List + Detail Split View -->
+            <div class="example-navigator-split">
+                <div class="example-list-panel">
+                    <div id="example-list-container" class="example-list-wrapper">
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>Loading examples...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="example-detail-panel">
+                    <div id="example-detail-container" class="example-detail-wrapper">
+                        <div class="loading-state">
+                            <p>Select an example to view details</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Multi-Rollout Analysis -->
+        <section class="analysis-section" id="analysis">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Multi-Rollout Analysis</h2>
+                    <p class="section-description">Consistency and variance across multiple attempts</p>
+                </div>
+            </div>
+            <div id="multi-rollout-content" class="analysis-grid">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Analyzing rollouts...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Dashboard Modules -->
+    <script src="/static/js/modules/state.js?v={{ cache_version }}"></script>
+    <script src="/static/js/modules/dom.js?v={{ cache_version }}"></script>
+    <script src="/static/js/modules/api.js?v={{ cache_version }}"></script>
+    <script src="/static/js/modules/websocket.js?v={{ cache_version }}"></script>
+    <script src="/static/js/modules/charts.js?v={{ cache_version }}"></script>
+    <script src="/static/js/modules/navigation.js?v={{ cache_version }}"></script>
+    <script src="/static/js/modules/sessions.js?v={{ cache_version }}"></script>
+    <script src="/static/js/dashboard.js?v={{ cache_version }}"></script>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+
+    <script>
+        // Populate compact context bar
+        async function populateContextBar() {
+            try {
+                const [envResponse, rewardResponse, progressResponse] = await Promise.all([
+                    fetch('/api/environment/info'),
+                    fetch('/api/reward-system/info'),
+                    fetch('/api/progress')
+                ]);
+
+                const envInfo = await envResponse.json();
+                const rewardInfo = await rewardResponse.json();
+                const progress = await progressResponse.json();
+
+                // Update context bar
+                if (envInfo && !envInfo.error) {
+                    // Show environment class name (ToolEnv, SingleTurnEnv, etc.)
+                    document.getElementById('context-env-type').textContent = envInfo.env_type || 'Unknown';
+
+                    // Show both dataset size and current evaluation size
+                    const datasetSize = envInfo.dataset_size || 0;
+                    const numExamples = envInfo.num_examples || progress.total || 0;
+
+                    let sizeText = '';
+                    if (datasetSize > 0 && numExamples > 0) {
+                        // Format: "10 of 7.5k examples"
+                        sizeText = `${numExamples} of ${(datasetSize / 1000).toFixed(1)}k examples`;
+                    } else if (datasetSize > 0) {
+                        sizeText = `${(datasetSize / 1000).toFixed(1)}k examples`;
+                    } else {
+                        sizeText = 'No dataset';
+                    }
+                    document.getElementById('context-dataset-size').textContent = sizeText;
+                }
+
+                if (rewardInfo && !rewardInfo.error) {
+                    const funcCount = rewardInfo.reward_functions ? rewardInfo.reward_functions.length : 0;
+                    const funcText = funcCount === 1 ? '1 reward function' : `${funcCount} reward functions`;
+                    document.getElementById('context-reward-count').textContent = funcText;
+
+                    // Remove "max: 1.0" - it's redundant
+                    document.getElementById('context-max-reward').textContent = '';
+                }
+
+                if (envInfo && !envInfo.error) {
+                    const tools = envInfo.tools || [];
+                    const toolsText = tools.length > 0 ? tools.join(', ') : 'No tools';
+                    document.getElementById('context-tools').textContent = toolsText;
+                }
+
+                // Reinitialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            } catch (error) {
+                console.error('Error populating context bar:', error);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            populateContextBar();
+        });
+    </script>
