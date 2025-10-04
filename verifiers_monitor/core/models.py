@@ -57,9 +57,9 @@ class EvaluationSession(SQLModel, table=True):  # type: ignore[call-arg]
     session_id: str = Field(index=True, unique=True)
     model_name: str
     environment_type: str
-    env_id: Optional[
-        str
-    ] = None  # Inferred environment name (e.g., "math-python", "gsm8k")
+    env_id: Optional[str] = (
+        None  # Inferred environment name (e.g., "math-python", "gsm8k")
+    )
     num_examples: int
     started_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
@@ -291,9 +291,9 @@ class SessionResponse(SQLModel):
     session_id: str
     model_name: str
     environment_type: str
-    env_id: Optional[
-        str
-    ] = None  # Inferred environment name (e.g., "math-python", "gsm8k")
+    env_id: Optional[str] = (
+        None  # Inferred environment name (e.g., "math-python", "gsm8k")
+    )
     num_examples: int
     started_at: datetime
     completed_at: Optional[datetime] = None

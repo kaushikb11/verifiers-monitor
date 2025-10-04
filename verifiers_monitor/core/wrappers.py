@@ -800,9 +800,9 @@ class EnvironmentWrapper:
                 "timestamp": time.time(),
                 "completion_length": len(str(completion)),
                 "task": task,
-                "metrics": rollout_score.metrics
-                if hasattr(rollout_score, "metrics")
-                else {},
+                "metrics": (
+                    rollout_score.metrics if hasattr(rollout_score, "metrics") else {}
+                ),
                 "prompt_hash": hashlib.sha256(
                     str(prompt).encode() if prompt else str(answer).encode()
                 ).hexdigest()[:16],
@@ -947,14 +947,18 @@ class EnvironmentWrapper:
             # Prompt configuration
             "system_prompt": getattr(env, "system_prompt", None),
             "few_shot": getattr(env, "few_shot", None),
-            "parser_type": type(getattr(env, "parser", None)).__name__
-            if hasattr(env, "parser")
-            else "unknown",
+            "parser_type": (
+                type(getattr(env, "parser", None)).__name__
+                if hasattr(env, "parser")
+                else "unknown"
+            ),
             "parser_config": self._get_parser_config(env),
             # Rubric configuration
-            "rubric_type": type(getattr(env, "rubric", None)).__name__
-            if hasattr(env, "rubric")
-            else "unknown",
+            "rubric_type": (
+                type(getattr(env, "rubric", None)).__name__
+                if hasattr(env, "rubric")
+                else "unknown"
+            ),
             "reward_functions": [],
             "reward_weights": [],
             "reward_function_details": {},
@@ -1028,9 +1032,11 @@ class EnvironmentWrapper:
         parser = env.parser
         config = {
             "type": type(parser).__name__,
-            "extract_function": getattr(parser.extract_fn, "__name__", "unknown")
-            if hasattr(parser, "extract_fn")
-            else None,
+            "extract_function": (
+                getattr(parser.extract_fn, "__name__", "unknown")
+                if hasattr(parser, "extract_fn")
+                else None
+            ),
         }
 
         if hasattr(parser, "__dict__"):

@@ -122,8 +122,8 @@ def create_websocket_routes(storage) -> APIRouter:
                 active_connections.remove(connection)
 
     # Attach functions to router for external access
-    router.broadcast_metrics = broadcast_metrics
-    router.cleanup_connections = cleanup_connections
-    router.active_connections = active_connections
+    router.broadcast_metrics = broadcast_metrics  # type: ignore[attr-defined]
+    router.cleanup_connections = cleanup_connections  # type: ignore[attr-defined]
+    router.active_connections = active_connections  # type: ignore[attr-defined]
 
     return router

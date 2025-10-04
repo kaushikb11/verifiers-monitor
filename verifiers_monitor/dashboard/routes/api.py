@@ -398,9 +398,11 @@ def create_api_routes(storage, get_env_info_func):
                 "reward_functions": env_info.get("reward_functions", []),
                 "reward_weights": env_info.get("reward_weights", []),
                 "reward_function_details": env_info.get("reward_function_details", {}),
-                "max_possible_reward": sum(env_info.get("reward_weights", []))
-                if env_info.get("reward_weights")
-                else None,
+                "max_possible_reward": (
+                    sum(env_info.get("reward_weights", []))
+                    if env_info.get("reward_weights")
+                    else None
+                ),
             }
 
             return reward_info

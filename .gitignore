@@ -169,16 +169,3 @@ test_vmf.db
 *.db
 vmf_metrics.db
 verifiers_monitor.db
-
-# Development/test files
-test.py
-test_*.py
-demo_*.py
-check_*.html
-*.log
-*_GUIDE.md
-*_DESIGN.md
-*_ROADMAP.md
-*_IMPACT.md
-*_ASPECTS_TO_TRACK.md
-TRAINING_*.md

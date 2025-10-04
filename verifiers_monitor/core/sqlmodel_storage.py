@@ -16,7 +16,7 @@ import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-from sqlmodel import Session, and_, desc, func, select
+from sqlmodel import Session, and_, col, desc, func, select
 
 from ..utils.logging import get_logger
 from ..utils.recovery import RetryConfig, retry_on_failure
@@ -345,9 +345,15 @@ class SQLModelStorage:
     def get_stats(self) -> Dict[str, Any]:
         """Get comprehensive database statistics"""
         with get_session(self.engine) as session:
-            rollout_count = session.exec(select(func.count(RolloutMetric.id))).one()
-            session_count = session.exec(select(func.count(EvaluationSession.id))).one()
-            training_count = session.exec(select(func.count(TrainingStep.id))).one()
+            rollout_count = session.exec(
+                select(func.count(col(RolloutMetric.id)))
+            ).one()
+            session_count = session.exec(
+                select(func.count(col(EvaluationSession.id)))
+            ).one()
+            training_count = session.exec(
+                select(func.count(col(TrainingStep.id)))
+            ).one()
 
             # Recent activity
             recent_sessions = session.exec(
@@ -660,7 +666,7 @@ class SQLModelStorage:
 
                 query = query.order_by(desc(RolloutMetric.timestamp))
 
-                count_query = select(func.count(RolloutMetric.id))
+                count_query = select(func.count(col(RolloutMetric.id)))
                 if session_id:
                     count_query = count_query.where(
                         RolloutMetric.session_id == session_id
