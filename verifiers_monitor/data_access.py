@@ -98,7 +98,7 @@ class MonitorData:
         """
         with Session(self.engine) as session:
             statement = select(EvaluationSession).order_by(
-                desc(EvaluationSession.started_at)
+                desc(col(EvaluationSession.started_at))
             )
             db_sessions = session.exec(statement).all()
             return [SessionResponse.from_db_model(s) for s in db_sessions]
@@ -123,7 +123,7 @@ class MonitorData:
         """
         with Session(self.engine) as session:
             statement = select(EvaluationSession).order_by(
-                desc(EvaluationSession.started_at)
+                desc(col(EvaluationSession.started_at))
             )
 
             if env_id:
@@ -184,7 +184,7 @@ class MonitorData:
             statement = (
                 select(EvaluationSession)
                 .where(EvaluationSession.env_id == env_id)
-                .order_by(desc(EvaluationSession.started_at))
+                .order_by(desc(col(EvaluationSession.started_at)))
             )
             db_sessions = session.exec(statement).all()
             return [SessionResponse.from_db_model(s) for s in db_sessions]
@@ -218,7 +218,7 @@ class MonitorData:
         """
         with Session(self.engine) as session:
             statement = select(EvaluationSession).order_by(
-                desc(EvaluationSession.started_at)
+                desc(col(EvaluationSession.started_at))
             )
 
             if env_id:
@@ -258,7 +258,9 @@ class MonitorData:
             statement = (
                 select(RolloutMetric)
                 .where(RolloutMetric.session_id == session_id)
-                .order_by(RolloutMetric.example_number, RolloutMetric.rollout_number)
+                .order_by(
+                    col(RolloutMetric.example_number), col(RolloutMetric.rollout_number)
+                )
             )
             db_rollouts = session.exec(statement).all()
             return [RolloutResponse.from_db_model(r) for r in db_rollouts]
@@ -287,7 +289,7 @@ class MonitorData:
                     RolloutMetric.session_id == session_id,
                     RolloutMetric.example_number == example_num,
                 )
-                .order_by(RolloutMetric.rollout_number)
+                .order_by(col(RolloutMetric.rollout_number))
             )
             db_rollouts = session.exec(statement).all()
             return [RolloutResponse.from_db_model(r) for r in db_rollouts]
@@ -333,7 +335,7 @@ class MonitorData:
                 )
 
             statement = statement.order_by(
-                RolloutMetric.example_number, RolloutMetric.rollout_number
+                col(RolloutMetric.example_number), col(RolloutMetric.rollout_number)
             )
 
             db_rollouts = session.exec(statement).all()

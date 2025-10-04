@@ -126,9 +126,9 @@ class MetricsCollector:
 
         # Verifiers uses round-robin pattern, not sequential
         self._prompt_hash_map: Dict[str, int] = {}  # prompt_hash -> example_number
-        self._example_rollout_counts: Dict[
-            int, int
-        ] = {}  # example_number -> rollout_count
+        self._example_rollout_counts: Dict[int, int] = (
+            {}
+        )  # example_number -> rollout_count
         self._next_example_number = 1
 
         session_info = {

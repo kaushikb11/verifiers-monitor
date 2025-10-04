@@ -115,12 +115,12 @@ class DataService:
                     )
                 ),
                 "average_reward": sum(rewards) / len(rewards) if rewards else 0,
-                "success_rate": sum(1 for r in rewards if r > 0) / len(rewards)
-                if rewards
-                else 0,
-                "average_response_time": sum(response_times) / len(response_times)
-                if response_times
-                else 0,
+                "success_rate": (
+                    sum(1 for r in rewards if r > 0) / len(rewards) if rewards else 0
+                ),
+                "average_response_time": (
+                    sum(response_times) / len(response_times) if response_times else 0
+                ),
                 "reward_distribution": {
                     "min": min(rewards) if rewards else 0,
                     "max": max(rewards) if rewards else 0,
