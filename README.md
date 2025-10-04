@@ -79,6 +79,7 @@ high_variance = variance_analysis[variance_analysis > 0.3]
 print(f"Found {len(high_variance)} unstable examples")
 ```
 
-## License
+---
+Questions? Create an Issue or reach out on [X](https://x.com/kaushik_bokka)
 
-Apache 2.0
+Happy building! 🚀
